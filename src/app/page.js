@@ -8,7 +8,6 @@ export default async function Home() {
     .select('*');
 
   if (error) {
-    // 使用 console.log 代替 console.error
     console.log('Error fetching subscriptions:', error);
     return (
       <Layout>

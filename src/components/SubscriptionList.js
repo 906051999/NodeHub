@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function SubscriptionList({ subscriptions, isPublic, isLoading, error }) {
+  const [updatingId, setUpdatingId] = useState(null);
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -30,11 +32,20 @@ export default function SubscriptionList({ subscriptions, isPublic, isLoading, e
   }
 
   const handleUpdate = async (id) => {
-    // 实现更新逻辑
-  };
-
-  const handleDelete = async (id) => {
-    // 实现删除逻辑
+    setUpdatingId(id);
+    try {
+      const response = await fetch(`/api/update-subscription/${id}`, { method: 'POST' });
+      if (!response.ok) {
+        throw new Error('更新失败');
+      }
+      // 这里可以添加更新成功后的逻辑，比如刷新列表
+      alert('更新成功');
+    } catch (error) {
+      console.error('更新订阅时出错:', error);
+      alert('更新失败，请稍后重试');
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   return (
@@ -50,24 +61,36 @@ export default function SubscriptionList({ subscriptions, isPublic, isLoading, e
                 <p className="text-sm font-medium text-indigo-600 truncate">{sub.provider}</p>
                 <p className="mt-1 text-sm text-gray-500">{sub.url}</p>
               </div>
-              <div className="ml-2 flex-shrink-0 flex">
+              <div className="ml-2 flex-shrink-0 flex items-center">
                 <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                  剩余流量: {sub.remaining_traffic}
+                  剩余流量: {formatTraffic(sub.remaining_traffic)}
                 </p>
                 <p className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                   有效期: {new Date(sub.expiration_date).toLocaleDateString()}
+                   有效期: {formatDate(sub.expiration_date)}
                 </p>
+                <button
+                  onClick={() => handleUpdate(sub.id)}
+                  disabled={updatingId === sub.id}
+                  className="ml-2 px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50"
+                >
+                  {updatingId === sub.id ? '更新中...' : '更新'}
+                </button>
               </div>
             </div>
-            {!isPublic && (
-              <div className="mt-2">
-                <button onClick={() => handleUpdate(sub.id)} className="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-xs">更新</button>
-                <button onClick={() => handleDelete(sub.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs">删除</button>
-              </div>
-            )}
           </li>
         ))}
       </ul>
     </div>
   );
+}
+
+function formatTraffic(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+  else if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  else return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+}
+
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleDateString();
 }
