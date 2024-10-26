@@ -32,14 +32,14 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">管理员面板</h1>
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">添加新订阅</h2>
+    <div className="space-y-8">
+      <h1 className="text-3xl font-semibold text-gray-800">管理员面板</h1>
+      <div className="bg-white shadow-sm rounded-lg p-6">
+        <h2 className="text-xl font-medium text-gray-700 mb-4">添加新订阅</h2>
         <AddSubscriptionForm onAdd={fetchSubscriptions} />
       </div>
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">订阅列表</h2>
+      <div className="bg-white shadow-sm rounded-lg p-6">
+        <h2 className="text-xl font-medium text-gray-700 mb-4">订阅列表</h2>
         <SubscriptionList 
           subscriptions={subscriptions} 
           isPublic={false} 
