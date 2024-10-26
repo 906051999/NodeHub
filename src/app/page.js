@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import SubscriptionList from '@/components/SubscriptionList';
 import Layout from '@/components/Layout';
-import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 
 export default function Home() {
-  const { setShowLoginModal } = useAuth();
   const [subscriptions, setSubscriptions] = useState([]);
   const [error, setError] = useState(null);
 
@@ -36,9 +33,6 @@ export default function Home() {
 
   return (
     <Layout>
-      <Suspense fallback={<div>Loading...</div>}>
-        <LoginCheck setShowLoginModal={setShowLoginModal} />
-      </Suspense>
       <div className="space-y-6">
         <div className="bg-white shadow-sm rounded-lg p-6">
           <SubscriptionList subscriptions={subscriptions} isPublic={true} />
@@ -46,16 +40,4 @@ export default function Home() {
       </div>
     </Layout>
   );
-}
-
-function LoginCheck({ setShowLoginModal }) {
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (searchParams.get('login') === 'true') {
-      setShowLoginModal(true);
-    }
-  }, [searchParams, setShowLoginModal]);
-
-  return null;
 }

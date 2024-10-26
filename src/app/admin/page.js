@@ -7,17 +7,20 @@ import Layout from '@/components/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminPage() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, setShowLoginModal, isLoggedOut } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!user || !isAdmin) {
-      router.push('/?login=true');
+      if (!isLoggedOut) {
+        setShowLoginModal(true);
+      }
+      router.push('/');
     }
-  }, [user, isAdmin, router]);
+  }, [user, isAdmin, router, setShowLoginModal, isLoggedOut]);
 
   if (!user || !isAdmin) {
-    return null; // 或者返回一个加载指示器
+    return null;
   }
 
   return (

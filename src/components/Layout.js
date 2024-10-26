@@ -6,7 +6,7 @@ import StatusBar from '@/components/StatusBar';
 import UserInfoModal from '@/components/UserInfoModal';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const DefaultAvatar = () => (
   <svg className="w-full h-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
@@ -16,19 +16,23 @@ const DefaultAvatar = () => (
 
 export default function Layout({ children }) {
   const [showUserInfoModal, setShowUserInfoModal] = useState(false);
-  const { user, login, logout, showLoginModal, setShowLoginModal } = useAuth();
+  const { user, login, logout, showLoginModal, setShowLoginModal, isLoggedOut, setIsLoggedOut } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (isLoggedOut) {
+      setShowLoginModal(false);
+      setIsLoggedOut(false);
+    }
+  }, [isLoggedOut, setShowLoginModal, setIsLoggedOut]);
 
   const handleLogin = (userData) => {
     login(userData);
-    setShowLoginModal(false);
-    router.push('/admin');
   };
 
   const handleLogout = () => {
     logout();
     setShowUserInfoModal(false);
-    router.push('/');
   };
 
   return (
